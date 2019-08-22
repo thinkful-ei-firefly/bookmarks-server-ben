@@ -4,8 +4,8 @@ const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
-const logger = require('../logger');
-const bookmarkRouter = require('./bookmark/bookmark-router.js');
+const logger = require('./logger');
+const bookmarkRouter = require('../bookmark/bookmark-router');
 
 const app = express();
 
@@ -15,10 +15,6 @@ app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
-
-app.get('/', (req, res) => {
-  res.send('Hello, world!');
-});
 
 app.use(function errorHandler(error, req, res, next) {
   let response;
@@ -42,10 +38,10 @@ app.use(function validateBearerToken(req, res, next) {
   next();
 });
 
-app.use(bookmarkRouter);
-
 app.get('/', (req, res) => {
   res.send('Please visit /bookmarks for a list of bookmarks!');
 });
+
+app.use(bookmarkRouter);
 
 module.exports = app;
