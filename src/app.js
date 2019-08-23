@@ -17,11 +17,12 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-app.use(errorHandler());
 app.use(validateBearerToken);
 app.use(bookmarkRouter);
 app.get('/', (req, res) => {
   res.send('Please visit /bookmarks for a list of bookmarks!');
 });
+
+app.use(errorHandler);
 
 module.exports = app;
