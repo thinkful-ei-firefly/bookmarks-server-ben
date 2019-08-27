@@ -1,11 +1,21 @@
 const express = require('express');
+const xss = require('xss');
+const BookmarksService = require('./bookmarks-service');
 
 const bookmarkRouter = express.Router();
 const bodyParser = express.json();
-const uuid = require('uuid/v4');
+
 const logger = require('../src/logger');
 const bookmarks = require('../src/store');
-const BookmarksService = require('../src/bookmarks-service');
+
+const xssBookmark = bookmark => ({
+  id: bookmark.id,
+  title: xss(bookmark.title),
+  book_url: bookmark.book_url,
+  book_desc: xss(bookmark.book_desc),
+  rating: bookmark.rating,
+  date_published: bookmark.date_published
+});
 
 bookmarkRouter
   .route('/bookmarks')
@@ -17,42 +27,24 @@ bookmarkRouter
       })
       .catch(next);
   })
-  .post(bodyParser, (req, res) => {
-    const { title, url, desc = '', rating } = req.body;
+  .post(bodyParser, (req, res, next) => {
+    const { title, book_url, book_desc = '', rating } = req.body;
+    const newBookmark = { title, book_url, book_desc, rating };
 
-    if (!title) {
-      logger.error('Title is required');
-      return res.status(400).send('Invalid data');
-    }
+    for (const [key, value] of Object.entries(newBookmark))
+      if (value == null)
+        return res.status(400).json({
+          error: { message: `Missing '${key}' in request body` }
+        });
 
-    if (!url) {
-      logger.error('Url is required');
-      return res.status(400).send('Invalid data');
-    }
-
-    if (!rating) {
-      logger.error('Rating is required');
-      return res.status(400).send('Invalid data');
-    }
-
-    const id = uuid();
-
-    const bookmark = {
-      id,
-      title,
-      url,
-      desc,
-      rating
-    };
-
-    bookmarks.push(bookmark);
-
-    logger.info(`Bookmark with id ${id} created`);
-
-    res
-      .status(201)
-      .location(`http://localhost:8000/bookmark/${id}`)
-      .json(bookmark);
+    BookmarksService.insertBookmark(req.app.get('db'), newBookmark)
+      .then(bookmark => {
+        res
+          .status(201)
+          .location(`/bookmarks/${bookmark.id}`)
+          .json(xssBookmark(bookmark));
+      })
+      .catch(next);
   });
 
 bookmarkRouter

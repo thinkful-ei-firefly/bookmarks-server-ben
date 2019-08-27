@@ -1,8 +1,11 @@
 const knex = require('knex');
 const app = require('../src/app');
-const { makeBookmarksArray } = require('./bookmarks.fixtures');
+const {
+  makeBookmarksArray,
+  makeMaliciousBookmark
+} = require('./bookmarks.fixtures');
 
-describe.only('Bookmarks Endpoints', function() {
+describe('Bookmarks Endpoints', function() {
   let db;
 
   before('make knex instance', () => {
@@ -45,14 +48,14 @@ describe.only('Bookmarks Endpoints', function() {
     });
   });
 
-  describe('GET /bookmarks/:Bookmark_id', () => {
+  describe('GET /bookmarks/:bookmark_id', () => {
     context('Given no bookmarks', () => {
       it('responds with 404', () => {
         const bookmarkId = 123456;
         return supertest(app)
           .get(`/bookmarks/${bookmarkId}`)
           .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
-          .expect(404, { error: { message: 'Bookmark doesn\'t exist' } });
+          .expect(404, { error: { message: "Bookmark doesn't exist" } });
       });
     });
 
@@ -71,6 +74,73 @@ describe.only('Bookmarks Endpoints', function() {
           .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
           .expect(200, expectedBookmark);
       });
+    });
+  });
+
+  describe('POST /bookmarks', () => {
+    it('creates a bookmark, responding with 201 and the new bookmark', () => {
+      const newBookmark = {
+        title: 'New bookmark!',
+        book_url: 'http://www.new.com/',
+        book_desc: 'New bookmark description',
+        rating: 5
+      };
+      return supertest(app)
+        .post('/bookmarks')
+        .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
+        .send(newBookmark)
+        .expect(201)
+        .expect(res => {
+          expect(res.body.title).to.eql(newBookmark.title);
+          expect(res.body.book_url).to.eql(newBookmark.book_url);
+          expect(res.body.book_desc).to.eql(newBookmark.book_desc);
+          expect(res.body).to.have.property('id');
+          expect(res.headers.location).to.eql(`/bookmarks/${res.body.id}`);
+          const expected = new Date().toLocaleString();
+          const actual = new Date(res.body.date_added).toLocaleString();
+          expect(actual).to.eql(expected);
+        })
+        .then(res =>
+          supertest(app)
+            .get(`/bookmarks/${res.body.id}`)
+            .expect(res.body)
+        );
+    });
+
+    const requiredFields = ['title', 'book_url', 'rating'];
+
+    requiredFields.forEach(field => {
+      const newBookmark = {
+        title: 'New bookmark!',
+        book_url: 'http://www.new.com/',
+        book_desc: 'New bookmark description',
+        rating: 5
+      };
+
+      it(`responds with 400 and an error message when the '${field}' is missing`, () => {
+        delete newBookmark[field];
+
+        return supertest(app)
+          .post('/bookmarks')
+          .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
+          .send(newBookmark)
+          .expect(400, {
+            error: { message: `Missing '${field}' in request body` }
+          });
+      });
+    });
+
+    it('removes XSS attack content from response', () => {
+      const { maliciousBookmark, expectedBookmark } = makeMaliciousBookmark();
+      return supertest(app)
+        .post('/bookmarks')
+        .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
+        .send(maliciousBookmark)
+        .expect(201)
+        .expect(res => {
+          expect(res.body.title).to.eql(expectedBookmark.title);
+          expect(res.body.content).to.eql(expectedBookmark.content);
+        });
     });
   });
 });
