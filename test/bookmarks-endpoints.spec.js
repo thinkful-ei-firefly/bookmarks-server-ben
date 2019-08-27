@@ -94,15 +94,14 @@ describe('Bookmarks Endpoints', function() {
           expect(res.body.title).to.eql(newBookmark.title);
           expect(res.body.book_url).to.eql(newBookmark.book_url);
           expect(res.body.book_desc).to.eql(newBookmark.book_desc);
+          expect(res.body.rating).to.eql(newBookmark.rating);
           expect(res.body).to.have.property('id');
           expect(res.headers.location).to.eql(`/bookmarks/${res.body.id}`);
-          const expected = new Date().toLocaleString();
-          const actual = new Date(res.body.date_added).toLocaleString();
-          expect(actual).to.eql(expected);
         })
         .then(res =>
           supertest(app)
             .get(`/bookmarks/${res.body.id}`)
+            .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
             .expect(res.body)
         );
     });
