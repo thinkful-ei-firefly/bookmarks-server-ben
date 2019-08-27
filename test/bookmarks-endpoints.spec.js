@@ -55,7 +55,7 @@ describe('Bookmarks Endpoints', function() {
         return supertest(app)
           .get(`/bookmarks/${bookmarkId}`)
           .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
-          .expect(404, { error: { message: "Bookmark doesn't exist" } });
+          .expect(404, { error: { message: 'Bookmark doesn\'t exist' } });
       });
     });
 
