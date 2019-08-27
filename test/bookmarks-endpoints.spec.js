@@ -46,6 +46,25 @@ describe('Bookmarks Endpoints', function() {
           .expect(200, testBookmarks);
       });
     });
+
+    context('Given an XSS attack bookmark', () => {
+      const { maliciousBookmark, expectedBookmark } = makeMaliciousBookmark();
+
+      beforeEach('insert malicious bookmark', () => {
+        return db.into('bookmarks_list').insert([maliciousBookmark]);
+      });
+
+      it('removes XSS attack content', () => {
+        return supertest(app)
+          .get('/bookmarks')
+          .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+          .expect(200)
+          .expect(res => {
+            expect(res.body[0].title).to.eql(expectedBookmark.title);
+            expect(res.body[0].book_desc).to.eql(expectedBookmark.book_desc);
+          });
+      });
+    });
   });
 
   describe('GET /bookmarks/:bookmark_id', () => {
@@ -73,6 +92,25 @@ describe('Bookmarks Endpoints', function() {
           .get(`/bookmarks/${bookmarkId}`)
           .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
           .expect(200, expectedBookmark);
+      });
+    });
+
+    context('Given an XSS attack bookmark', () => {
+      const { maliciousBookmark, expectedBookmark } = makeMaliciousBookmark();
+
+      beforeEach('insert malicious bookmark', () => {
+        return db.into('bookmarks_list').insert([maliciousBookmark]);
+      });
+
+      it('removes XSS attack content', () => {
+        return supertest(app)
+          .get(`/bookmarks/${maliciousBookmark.id}`)
+          .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+          .expect(200)
+          .expect(res => {
+            expect(res.body.title).to.eql(expectedBookmark.title);
+            expect(res.body.book_desc).to.eql(expectedBookmark.book_desc);
+          });
       });
     });
   });

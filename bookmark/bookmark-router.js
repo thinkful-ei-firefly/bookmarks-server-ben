@@ -13,8 +13,7 @@ const xssBookmark = bookmark => ({
   title: xss(bookmark.title),
   book_url: bookmark.book_url,
   book_desc: xss(bookmark.book_desc),
-  rating: bookmark.rating,
-  date_published: bookmark.date_published
+  rating: Number(bookmark.rating)
 });
 
 bookmarkRouter
@@ -23,7 +22,7 @@ bookmarkRouter
     const knexInstance = req.app.get('db');
     BookmarksService.getAllBookmarks(knexInstance)
       .then(bookmarks => {
-        res.json(bookmarks);
+        res.json(bookmarks.map(bookmark => xssBookmark(bookmark)));
       })
       .catch(next);
   })
@@ -58,7 +57,7 @@ bookmarkRouter
             error: { message: 'Bookmark doesn\'t exist' }
           });
         }
-        res.json(bookmark);
+        res.json(xssBookmark(bookmark));
       })
       .catch(next);
   })
