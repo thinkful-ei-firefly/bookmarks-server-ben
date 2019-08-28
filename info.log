@@ -39,3 +39,54 @@
 {"message":"Unauthorized request to path: /bookmarks","level":"error"}
 {"message":"Unauthorized request to path: /bookmarks","level":"error"}
 {"message":"Unauthorized request to path: /bookmarks/1","level":"error"}
+{"message":"title is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"title is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"rating is required.","level":"error"}
+{"message":"title is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"title is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"rating is required.","level":"error"}
+{"message":"title is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"title is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"rating is required.","level":"error"}
+{"message":"title is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"title is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"rating is required.","level":"error"}
+{"message":"title is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"title is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"rating is required.","level":"error"}
+{"message":"title is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"rating is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"title is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"rating is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"title is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"rating is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"title is required.","level":"error"}
+{"message":"book_url is required.","level":"error"}
+{"message":"rating is required.","level":"error"}
+{"message":"Invalid rating 'invalid' supplied","level":"error"}

@@ -31,20 +31,20 @@ bookmarkRouter
       if (!req.body[field]) {
         logger.error(`${field} is required.`);
         return res.status(400).send({
-          error: { message: `${field} is required.` }
+          error: { message: `Missing '${field}' in request body.` }
         });
       }
     }
-    
+
     const { title, book_url, book_desc = '', rating } = req.body;
-    
+
     if (!Number.isInteger(rating) || rating < 0 || rating > 5) {
       logger.error(`Invalid rating '${rating}' supplied`);
       return res.status(400).send({
-        error: { message: `'rating' must be a number between 0 and 5` }
+        error: { message: 'rating must be a number between 0 and 5.' }
       });
     }
-    
+
     const newBookmark = { title, book_url, book_desc, rating };
 
     for (const [key, value] of Object.entries(newBookmark))
@@ -71,7 +71,7 @@ bookmarkRouter
       .then(bookmark => {
         if (!bookmark) {
           return res.status(404).json({
-            error: { message: 'Bookmark doesn\'t exist' }
+            error: { message: "Bookmark doesn't exist" }
           });
         }
         res.json(xssBookmark(bookmark));
