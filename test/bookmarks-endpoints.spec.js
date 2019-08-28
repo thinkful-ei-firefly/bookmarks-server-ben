@@ -244,7 +244,7 @@ describe('Bookmarks Endpoints', function() {
       });
     });
 
-    context('Given there are articles in the database', () => {
+    context('Given there are bookmarks in the database', () => {
       const testBookmarks = makeBookmarksArray();
 
       beforeEach('insert bookmarks', () => {
@@ -313,6 +313,17 @@ describe('Bookmarks Endpoints', function() {
               .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
               .expect(expectedBookmark)
           );
+      });
+
+      it(`responds with 400 invalid 'rating' if not between 0 and 5`, () => {
+        const bookmarkId = 2;
+        return supertest(app)
+          .patch(`/api/bookmarks/${bookmarkId}`)
+          .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
+          .send({ rating: 'invalid' })
+          .expect(400, {
+            error: { message: 'rating must be a number between 0 and 5.' }
+          });
       });
     });
   });

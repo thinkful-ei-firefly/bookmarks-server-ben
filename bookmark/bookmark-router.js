@@ -92,12 +92,14 @@ bookmarkRouter
   .patch(bodyParser, (req, res, next) => {
     const { title, book_url, book_desc, rating } = req.body;
 
-    // if (!Number.isInteger(rating) || rating < 0 || rating > 5) {
-    //   logger.error(`Invalid rating '${rating}' supplied`);
-    //   return res.status(400).send({
-    //     error: { message: 'rating must be a number between 0 and 5.' }
-    //   });
-    // }
+    if (rating) {
+      if (!Number.isInteger(rating) || rating < 0 || rating > 5) {
+        logger.error(`Invalid rating '${rating}' supplied`);
+        return res.status(400).send({
+          error: { message: 'rating must be a number between 0 and 5.' }
+        });
+      }
+    }
 
     const bookmarkToUpdate = { title, book_url, book_desc, rating };
 
