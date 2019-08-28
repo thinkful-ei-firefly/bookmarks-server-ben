@@ -47,11 +47,11 @@ bookmarkRouter
 
     const newBookmark = { title, book_url, book_desc, rating };
 
-    for (const [key, value] of Object.entries(newBookmark))
-      if (value == null)
-        return res.status(400).json({
-          error: { message: `Missing '${key}' in request body` }
-        });
+    // for (const [key, value] of Object.entries(newBookmark))
+    //   if (value == null)
+    //     return res.status(400).json({
+    //       error: { message: `Missing '${key}' in request body` }
+    //     });
 
     BookmarksService.insertBookmark(req.app.get('db'), newBookmark)
       .then(bookmark => {
@@ -85,6 +85,38 @@ bookmarkRouter
     const knexInstance = req.app.get('db');
     BookmarksService.deleteBookmark(knexInstance, req.params.id)
       .then(() => {
+        res.status(204).end();
+      })
+      .catch(next);
+  })
+  .patch(bodyParser, (req, res, next) => {
+    const { title, book_url, book_desc, rating } = req.body;
+
+    // if (!Number.isInteger(rating) || rating < 0 || rating > 5) {
+    //   logger.error(`Invalid rating '${rating}' supplied`);
+    //   return res.status(400).send({
+    //     error: { message: 'rating must be a number between 0 and 5.' }
+    //   });
+    // }
+
+    const bookmarkToUpdate = { title, book_url, book_desc, rating };
+
+    const numberOfValues = Object.values(bookmarkToUpdate).filter(Boolean)
+      .length;
+    if (numberOfValues === 0) {
+      return res.status(400).json({
+        error: {
+          message: `Request body must contain either 'title', 'book_url', 'book_desc', or 'rating'`
+        }
+      });
+    }
+
+    BookmarksService.updateBookmark(
+      req.app.get('db'),
+      req.params.id,
+      bookmarkToUpdate
+    )
+      .then(numRowsAffected => {
         res.status(204).end();
       })
       .catch(next);
