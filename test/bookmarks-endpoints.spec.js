@@ -85,7 +85,7 @@ describe('Bookmarks Endpoints', function() {
         return db.into('bookmarks_list').insert(testBookmarks);
       });
 
-      it('responds with 200 and the specified Bookmark', () => {
+      it('responds with 200 and the specified bookmark', () => {
         const bookmarkId = 2;
         const expectedBookmark = testBookmarks[bookmarkId - 1];
         return supertest(app)
@@ -201,7 +201,7 @@ describe('Bookmarks Endpoints', function() {
       it('responds with 404', () => {
         const bookmarkId = 123456;
         return supertest(app)
-          .get(`/bookmarks/${bookmarkId}`)
+          .delete(`/bookmarks/${bookmarkId}`)
           .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
           .expect(404, { error: { message: "Bookmark doesn't exist" } });
       });
@@ -214,13 +214,21 @@ describe('Bookmarks Endpoints', function() {
         return db.into('bookmarks_list').insert(testBookmarks);
       });
 
-      it('responds with 200 and the specified Bookmark', () => {
+      it('responds with 204 and removes the bookmark', () => {
         const bookmarkId = 2;
-        const expectedBookmark = testBookmarks[bookmarkId - 1];
+        const expectedBookmarks = testBookmarks.filter(
+          bookmark => bookmark.id !== bookmarkId
+        );
         return supertest(app)
-          .get(`/bookmarks/${bookmarkId}`)
+          .delete(`/bookmarks/${bookmarkId}`)
           .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
-          .expect(200, expectedBookmark);
+          .expect(204)
+          .then(res =>
+            supertest(app)
+              .get('/bookmarks')
+              .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
+              .expect(expectedBookmarks)
+          );
       });
     });
   });
