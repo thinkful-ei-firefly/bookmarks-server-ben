@@ -116,6 +116,63 @@ describe('Bookmarks Endpoints', function() {
   });
 
   describe('POST /bookmarks', () => {
+    it(`responds with 400 missing 'title' if not supplied`, () => {
+      const noTitle = {
+        url: 'https://www.test.com/',
+        rating: 1
+      };
+      return supertest(app)
+        .post('/bookmarks')
+        .send(noTitle)
+        .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+        .expect(400, {
+          error: { message: `'title' is required` }
+        });
+    });
+
+    it(`responds with 400 missing 'url' if not supplied`, () => {
+      const noUrl = {
+        title: 'Test title',
+        rating: 1
+      };
+      return supertest(app)
+        .post(`/bookmarks`)
+        .send(noUrl)
+        .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+        .expect(400, {
+          error: { message: `'url' is required` }
+        });
+    });
+
+    it(`responds with 400 missing 'rating' if not supplied`, () => {
+      const noRating = {
+        title: 'Test title',
+        url: 'https://www.test.com/'
+      };
+      return supertest(app)
+        .post('/bookmarks')
+        .send(noRating)
+        .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+        .expect(400, {
+          error: { message: `'rating' is required` }
+        });
+    });
+
+    it(`responds with 400 invalid 'rating' if not between 0 and 5`, () => {
+      const invalidRating = {
+        title: 'Test title',
+        url: 'https://www.test.com/',
+        rating: 'invalid'
+      };
+      return supertest(app)
+        .post(`/bookmarks`)
+        .send(invalidRating)
+        .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+        .expect(400, {
+          error: { message: `'rating' must be a number between 0 and 5` }
+        });
+    });
+    
     it('creates a bookmark, responding with 201 and the new bookmark', () => {
       const newBookmark = {
         title: 'New bookmark!',
