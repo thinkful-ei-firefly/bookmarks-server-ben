@@ -22,7 +22,7 @@ app.use(cors());
 // app.use(express.json());
 
 app.use(validateBearerToken);
-app.use(bookmarkRouter);
+app.use('/api/bookmarks', bookmarkRouter);
 app.get('/', (req, res) => {
   res.send('Please visit /bookmarks for a list of bookmarks!');
 });
